@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <title>TOP</title>
+</head>
+<body>
+<div class="header-contents">
+    <h1>匿名掲示板</h1>
+</div>
+<div class="main-contents">
+    <a href="/new">
+        <button class="new-button" type="button">新規投稿</button>
+    </a>
+    <div class="message-icon" th:each="content : ${contents}">
+        <div>
+            ID : <span th:text="${content.id}"/>
+        </div>
+        <div class="text">
+            投稿 : <span th:text="${content.content}"/>
+        </div>
+
+        <!-- 7.追加実装課題(削除機能) -->
+<!--↓自作コード（動かない）-->
+<!--        <form method="post" action="/del">-->
+<!--            <input type="hidden" value="${content.id}" />-->
+<!--            <input class="delete-button" type="submit" value="削除" />-->
+<!--        </form>-->
+        <div class="delete-button">
+            <!--th：Thymeleafを使用するための記載-->
+            <!--th:action：アクションの内容を置換する(@{}でコンテキスト・パスを相対から絶対へ)-->
+            <form th:action="@{/delete/{id}(id=${content.id})}" th:method="delete">
+                <input type="submit" value="削除">
+            </form>
+        </div>
+
+        <!-- 7.追加実装課題(編集機能) -->
+        <!--編集画面への遷移用のリンクを追加-->
+<!--
+        <a href="/edit">
+
+            &lt;!&ndash;編集画面に反映させる投稿レコードを取得&ndash;&gt;
+            <form th:action="@{/selectCommentReport/{id}(id=${content.id})}" th:method="get">
+                <button class="edit-button" type="button">編集</button>
+            </form>
+        </a>
+↓以下回答-->
+
+        <div class="edit-button">
+            <a th:href="@{/edit/{id}(id=${content.id})}">
+                <input type="button" value="編集">
+            </a>
+        </div>
+
+        <!--1. 投稿へのコメント機能を追加-->
+        <form th:method=post th:action="@{/addComments/{id}(id=${content.id})}" th:object="${formModel}">
+            <textarea class="tweet-box" name="text" th:field="*{text}" size="20" maxlength="200" /></textarea><br/>
+            <input type="submit" value="返信" />
+        </form>
+
+        <div class="message-icon" th:each="comment : ${comments}">
+            <div th:if="${comment.id == content.id}">
+                返信 : <span th:text="${comments.text}"/>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

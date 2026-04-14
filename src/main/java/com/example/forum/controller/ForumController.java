@@ -15,6 +15,8 @@ import java.util.List;
 public class ForumController {
     @Autowired
     ReportService reportService;
+
+    @Autowired
     CommentService commentService;
 
     /*
@@ -25,6 +27,12 @@ public class ForumController {
         ModelAndView mav = new ModelAndView();
         // 投稿を全件取得
         List<ReportForm> contentData = reportService.findAllReport();
+
+        // --- ここを追加 ---
+        // 画面（top.html）でフォーム（検索や投稿用など）を使っている場合、
+        // 空のオブジェクトが必要
+        mav.addObject("formModel", new CommentForm ());
+
         // 画面遷移先を指定
         mav.setViewName("/top");
         // 投稿データオブジェクトを保管
@@ -126,12 +134,12 @@ public class ForumController {
     }
 
     // 1. 投稿へのコメント機能を追加
-    @PostMapping("/addComments")
+    @PostMapping("/addComments/{id}")
     public ModelAndView addComment(@PathVariable Integer id,
                                    @ModelAttribute("formModel") CommentForm commentForm){
 
         // URLから受け取ったので設定する
-        commentForm.setId(id);
+        commentForm.setReportId(id);
 
         // 返信をテーブルに格納
         commentService.saveComment(commentForm);
